@@ -2,7 +2,7 @@ from typing import Any
 
 from langchain_anthropic import ChatAnthropic
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_openai import ChatOpenAI
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
 
 from lfx.base.models.anthropic_constants import ANTHROPIC_MODELS
 from lfx.base.models.google_generative_ai_constants import GOOGLE_GENERATIVE_AI_MODELS
@@ -27,11 +27,16 @@ class LanguageModelComponent(LCModelComponent):
         DropdownInput(
             name="provider",
             display_name="Model Provider",
-            options=["OpenAI", "Anthropic", "Google"],
+            options=["OpenAI", "Azure OpenAI", "Anthropic", "Google"],
             value="OpenAI",
             info="Select the model provider",
             real_time_refresh=True,
-            options_metadata=[{"icon": "OpenAI"}, {"icon": "Anthropic"}, {"icon": "GoogleGenerativeAI"}],
+            options_metadata=[
+                {"icon": "OpenAI"},
+                {"icon": "Azure"},
+                {"icon": "Anthropic"},
+                {"icon": "GoogleGenerativeAI"}
+            ],
         ),
         DropdownInput(
             name="model_name",
@@ -98,6 +103,20 @@ class LanguageModelComponent(LCModelComponent):
                 streaming=stream,
                 openai_api_key=self.api_key,
             )
+        if provider == "Azure OpenAI":
+            # Note: Azure OpenAI requires additional configuration parameters
+            # This is a basic implementation - users should use the dedicated AzureChatOpenAIComponent
+            # for full Azure OpenAI support with proper endpoint/deployment configuration
+            if not self.api_key:
+                msg = "Azure OpenAI API key is required when using Azure OpenAI provider"
+                raise ValueError(msg)
+
+            return AzureChatOpenAI(
+                azure_deployment=model_name,
+                temperature=temperature,
+                streaming=stream,
+                api_key=self.api_key,
+            )
         if provider == "Anthropic":
             if not self.api_key:
                 msg = "Anthropic API key is required when using Anthropic provider"
@@ -127,6 +146,11 @@ class LanguageModelComponent(LCModelComponent):
                 build_config["model_name"]["options"] = OPENAI_CHAT_MODEL_NAMES + OPENAI_REASONING_MODEL_NAMES
                 build_config["model_name"]["value"] = OPENAI_CHAT_MODEL_NAMES[0]
                 build_config["api_key"]["display_name"] = "OpenAI API Key"
+            elif field_value == "Azure OpenAI":
+                # Azure OpenAI supports the same models as OpenAI
+                build_config["model_name"]["options"] = OPENAI_CHAT_MODEL_NAMES + OPENAI_REASONING_MODEL_NAMES
+                build_config["model_name"]["value"] = OPENAI_CHAT_MODEL_NAMES[0]
+                build_config["api_key"]["display_name"] = "Azure OpenAI API Key"
             elif field_value == "Anthropic":
                 build_config["model_name"]["options"] = ANTHROPIC_MODELS
                 build_config["model_name"]["value"] = ANTHROPIC_MODELS[0]
