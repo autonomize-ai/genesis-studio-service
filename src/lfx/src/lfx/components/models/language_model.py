@@ -8,9 +8,10 @@ from lfx.base.models.anthropic_constants import ANTHROPIC_MODELS
 from lfx.base.models.google_generative_ai_constants import GOOGLE_GENERATIVE_AI_MODELS
 from lfx.base.models.model import LCModelComponent
 from lfx.base.models.openai_constants import OPENAI_CHAT_MODEL_NAMES, OPENAI_REASONING_MODEL_NAMES
+from lfx.components.azure.azure_openai import AzureChatOpenAIComponent
 from lfx.field_typing import LanguageModel
 from lfx.field_typing.range_spec import RangeSpec
-from lfx.inputs.inputs import BoolInput
+from lfx.inputs.inputs import BoolInput, MessageTextInput
 from lfx.io import DropdownInput, MessageInput, MultilineInput, SecretStrInput, SliderInput
 from lfx.schema.dotdict import dotdict
 
@@ -53,6 +54,28 @@ class LanguageModelComponent(LCModelComponent):
             required=False,
             show=True,
             real_time_refresh=True,
+        ),
+        MessageTextInput(
+            name="azure_endpoint",
+            display_name="Azure Endpoint",
+            info="Your Azure endpoint, including the resource. Example: `https://example-resource.azure.openai.com/`",
+            required=False,
+            show=False,  # Will be shown only when Azure OpenAI is selected
+        ),
+        DropdownInput(
+            name="api_version",
+            display_name="API Version",
+            options=sorted(AzureChatOpenAIComponent.AZURE_OPENAI_API_VERSIONS, reverse=True),
+            value=next(
+                (
+                    version
+                    for version in sorted(AzureChatOpenAIComponent.AZURE_OPENAI_API_VERSIONS, reverse=True)
+                    if not version.endswith("-preview")
+                ),
+                AzureChatOpenAIComponent.AZURE_OPENAI_API_VERSIONS[0],
+            ),
+            info="Azure OpenAI API version",
+            show=False,  # Will be shown only when Azure OpenAI is selected
         ),
         MessageInput(
             name="input_value",
@@ -104,15 +127,17 @@ class LanguageModelComponent(LCModelComponent):
                 openai_api_key=self.api_key,
             )
         if provider == "Azure OpenAI":
-            # Note: Azure OpenAI requires additional configuration parameters
-            # This is a basic implementation - users should use the dedicated AzureChatOpenAIComponent
-            # for full Azure OpenAI support with proper endpoint/deployment configuration
             if not self.api_key:
                 msg = "Azure OpenAI API key is required when using Azure OpenAI provider"
                 raise ValueError(msg)
+            if not self.azure_endpoint:
+                msg = "Azure endpoint is required when using Azure OpenAI provider"
+                raise ValueError(msg)
 
             return AzureChatOpenAI(
+                azure_endpoint=self.azure_endpoint,
                 azure_deployment=model_name,
+                api_version=self.api_version,
                 temperature=temperature,
                 streaming=stream,
                 api_key=self.api_key,
@@ -146,19 +171,27 @@ class LanguageModelComponent(LCModelComponent):
                 build_config["model_name"]["options"] = OPENAI_CHAT_MODEL_NAMES + OPENAI_REASONING_MODEL_NAMES
                 build_config["model_name"]["value"] = OPENAI_CHAT_MODEL_NAMES[0]
                 build_config["api_key"]["display_name"] = "OpenAI API Key"
+                build_config["azure_endpoint"]["show"] = False
+                build_config["api_version"]["show"] = False
             elif field_value == "Azure OpenAI":
                 # Azure OpenAI supports the same models as OpenAI
                 build_config["model_name"]["options"] = OPENAI_CHAT_MODEL_NAMES + OPENAI_REASONING_MODEL_NAMES
                 build_config["model_name"]["value"] = OPENAI_CHAT_MODEL_NAMES[0]
                 build_config["api_key"]["display_name"] = "Azure OpenAI API Key"
+                build_config["azure_endpoint"]["show"] = True
+                build_config["api_version"]["show"] = True
             elif field_value == "Anthropic":
                 build_config["model_name"]["options"] = ANTHROPIC_MODELS
                 build_config["model_name"]["value"] = ANTHROPIC_MODELS[0]
                 build_config["api_key"]["display_name"] = "Anthropic API Key"
+                build_config["azure_endpoint"]["show"] = False
+                build_config["api_version"]["show"] = False
             elif field_value == "Google":
                 build_config["model_name"]["options"] = GOOGLE_GENERATIVE_AI_MODELS
                 build_config["model_name"]["value"] = GOOGLE_GENERATIVE_AI_MODELS[0]
                 build_config["api_key"]["display_name"] = "Google API Key"
+                build_config["azure_endpoint"]["show"] = False
+                build_config["api_version"]["show"] = False
         elif field_name == "model_name" and field_value.startswith("o1") and self.provider == "OpenAI":
             # Hide system_message for o1 models - currently unsupported
             if "system_message" in build_config:
