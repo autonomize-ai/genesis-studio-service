@@ -33,7 +33,7 @@ def set_advanced_true(component_input):
     return component_input
 
 
-MODEL_PROVIDERS_LIST = ["Anthropic", "Google Generative AI", "OpenAI"]
+MODEL_PROVIDERS_LIST = ["Anthropic", "Google Generative AI", "OpenAI", "Azure OpenAI"]
 
 
 class AgentComponent(ToolCallingAgentComponent):
