@@ -6,7 +6,13 @@ This module provides configuration settings for Genesis Studio extensions.
 import os
 from typing import Optional
 
-from pydantic import BaseSettings, Field
+try:
+    from pydantic_settings import BaseSettings, SettingsConfigDict
+except ImportError:
+    # Fallback for older pydantic versions
+    from pydantic import BaseSettings
+    from pydantic_settings import SettingsConfigDict
+from pydantic import Field
 
 
 class GenesisSettings(BaseSettings):
@@ -27,9 +33,11 @@ class GenesisSettings(BaseSettings):
     # Experiment/project name
     AUTONOMIZE_EXPERIMENT_NAME: str = Field(default="GenesisStudio", env="AUTONOMIZE_EXPERIMENT_NAME")
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        extra="ignore"  # Allow extra environment variables without validation errors
+    )
 
     @property
     def kafka_brokers_clean(self) -> Optional[str]:

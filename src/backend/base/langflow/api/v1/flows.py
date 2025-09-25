@@ -132,12 +132,10 @@ async def _new_flow(
         db_flow.updated_at = datetime.now(timezone.utc)
 
         if db_flow.folder_id is None:
-            # Make sure flows always have a folder
-            default_folder = (
-                await session.exec(select(Folder).where(Folder.name == DEFAULT_FOLDER_NAME, Folder.user_id == user_id))
-            ).first()
-            if default_folder:
-                db_flow.folder_id = default_folder.id
+            # Make sure flows always have a folder - create default folder if needed
+            from langflow.initial_setup.setup import get_or_create_default_folder
+            default_folder = await get_or_create_default_folder(session, user_id)
+            db_flow.folder_id = default_folder.id
 
         session.add(db_flow)
     except Exception as e:
@@ -412,13 +410,13 @@ async def create_flows(
     """Create multiple new flows."""
     db_flows = []
     for flow in flow_list.flows:
-        flow.user_id = current_user.id
-        db_flow = Flow.model_validate(flow, from_attributes=True)
-        session.add(db_flow)
+        # Use _new_flow to ensure proper folder assignment and validation
+        db_flow = await _new_flow(session=session, flow=flow, user_id=current_user.id)
         db_flows.append(db_flow)
     await session.commit()
     for db_flow in db_flows:
         await session.refresh(db_flow)
+        await _save_flow_to_fs(db_flow)
     return db_flows
 
 
