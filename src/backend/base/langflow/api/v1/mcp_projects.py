@@ -1158,9 +1158,8 @@ async def init_mcp_servers():
             for project in projects:
                 try:
                     # Auto-enable API key auth for projects without auth settings or with "none" auth
-                    # when AUTO_LOGIN is false and Genesis auth is not enabled
-                    from langflow.custom.genesis.core.config import settings as genesis_settings
-                    if not settings_service.auth_settings.AUTO_LOGIN and not genesis_settings.GENESIS_AUTH_ENABLED:
+                    # when AUTO_LOGIN is false
+                    if not settings_service.auth_settings.AUTO_LOGIN:
                         should_update_to_apikey = False
 
                         if not project.auth_settings:

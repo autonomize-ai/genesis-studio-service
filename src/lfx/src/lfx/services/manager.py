@@ -63,14 +63,14 @@ class ServiceManager:
         service_name = service_factory.service_class.name
         self.factories[service_name] = service_factory
 
-    def get(self, service_name: ServiceType | str, default: ServiceFactory | None = None) -> Service:
+    def get(self, service_name: ServiceType, default: ServiceFactory | None = None) -> Service:
         """Get (or create) a service by its name."""
         with self._lock:
             if service_name not in self.services:
                 self._create_service(service_name, default)
             return self.services[service_name]
 
-    def _create_service(self, service_name: ServiceType | str, default: ServiceFactory | None = None) -> None:
+    def _create_service(self, service_name: ServiceType, default: ServiceFactory | None = None) -> None:
         """Create a new service given its name, handling dependencies."""
         logger.debug(f"Create service {service_name}")
         self._validate_service_creation(service_name, default)
@@ -81,126 +81,6 @@ class ServiceManager:
             factory = SettingsServiceFactory()
             if factory not in self.factories:
                 self.register_factory(factory)
-        elif service_name == ServiceType.KNOWLEDGE_SERVICE:
-            # Special handling for knowledge service which is in the langflow backend
-            try:
-                # Try different import paths
-                try:
-                    from langflow.custom.genesis.services.knowledge.factory import KnowledgeServiceFactory
-                except ImportError:
-                    from src.backend.base.langflow.custom.genesis.services.knowledge.factory import (
-                        KnowledgeServiceFactory,
-                    )
-
-                factory = KnowledgeServiceFactory()
-                if factory not in self.factories:
-                    self.register_factory(factory)
-                factory = self.factories.get(service_name)
-            except ImportError:
-                logger.warning("KnowledgeServiceFactory not available")
-                factory = None
-        elif service_name == ServiceType.FLEXSTORE_SERVICE:
-            # Special handling for flexstore service
-            try:
-                try:
-                    from langflow.custom.genesis.services.flexstore.factory import FlexStoreServiceFactory
-                except ImportError:
-                    from src.backend.base.langflow.custom.genesis.services.flexstore.factory import (
-                        FlexStoreServiceFactory,
-                    )
-
-                factory = FlexStoreServiceFactory()
-                if factory not in self.factories:
-                    self.register_factory(factory)
-                factory = self.factories.get(service_name)
-            except ImportError:
-                logger.warning("FlexStoreServiceFactory not available")
-                factory = None
-        elif service_name == ServiceType.MODELHUB_SERVICE:
-            # Special handling for modelhub service
-            try:
-                try:
-                    from langflow.custom.genesis.services.modelhub.factory import ModelHubServiceFactory
-                except ImportError:
-                    from src.backend.base.langflow.custom.genesis.services.modelhub.factory import (
-                        ModelHubServiceFactory,
-                    )
-
-                factory = ModelHubServiceFactory()
-                if factory not in self.factories:
-                    self.register_factory(factory)
-                factory = self.factories.get(service_name)
-            except ImportError:
-                logger.warning("ModelHubServiceFactory not available")
-                factory = None
-        elif service_name == ServiceType.OCR_SERVICE:
-            # Special handling for ocr service
-            try:
-                try:
-                    from langflow.custom.genesis.services.ocr.factory import OCRServiceFactory
-                except ImportError:
-                    from src.backend.base.langflow.custom.genesis.services.ocr.factory import (
-                        OCRServiceFactory,
-                    )
-
-                factory = OCRServiceFactory()
-                if factory not in self.factories:
-                    self.register_factory(factory)
-                factory = self.factories.get(service_name)
-            except ImportError:
-                logger.warning("OCRServiceFactory not available")
-                factory = None
-        elif service_name == ServiceType.PROMPT_SERVICE:
-            # Special handling for prompt service
-            try:
-                try:
-                    from langflow.custom.genesis.services.prompt.factory import PromptServiceFactory
-                except ImportError:
-                    from src.backend.base.langflow.custom.genesis.services.prompt.factory import (
-                        PromptServiceFactory,
-                    )
-
-                factory = PromptServiceFactory()
-                if factory not in self.factories:
-                    self.register_factory(factory)
-                factory = self.factories.get(service_name)
-            except ImportError:
-                logger.warning("PromptServiceFactory not available")
-                factory = None
-        elif service_name == ServiceType.RAG_SERVICE:
-            # Special handling for rag service
-            try:
-                try:
-                    from langflow.custom.genesis.services.rag.factory import RAGServiceFactory
-                except ImportError:
-                    from src.backend.base.langflow.custom.genesis.services.rag.factory import (
-                        RAGServiceFactory,
-                    )
-
-                factory = RAGServiceFactory()
-                if factory not in self.factories:
-                    self.register_factory(factory)
-                factory = self.factories.get(service_name)
-            except ImportError:
-                logger.warning("RAGServiceFactory not available")
-                factory = None
-        elif service_name == ServiceType.GENESIS_TRACING_SERVICE:
-            # Special handling for genesis tracing service
-            try:
-                try:
-                    from langflow.custom.genesis.services.tracing.factory import TracingServiceFactory
-                except ImportError:
-                    from src.backend.base.langflow.custom.genesis.services.tracing.factory import (
-                        TracingServiceFactory,
-                    )
-
-                factory = TracingServiceFactory()
-                if factory not in self.factories:
-                    self.register_factory(factory)
-                factory = self.factories.get(service_name)
-            except ImportError:
-                logger.warning("TracingServiceFactory not available")
-                factory = None
         else:
             factory = self.factories.get(service_name)
 
@@ -222,27 +102,15 @@ class ServiceManager:
         self.services[service_name] = self.factories[service_name].create(**dependent_services)
         self.services[service_name].set_ready()
 
-    def _validate_service_creation(
-        self, service_name: ServiceType | str, default: ServiceFactory | None = None
-    ) -> None:
+    def _validate_service_creation(self, service_name: ServiceType, default: ServiceFactory | None = None) -> None:
         """Validate whether the service can be created."""
-        if service_name in (
-            ServiceType.SETTINGS_SERVICE,
-            ServiceType.KNOWLEDGE_SERVICE,
-            ServiceType.FLEXSTORE_SERVICE,
-            ServiceType.MODELHUB_SERVICE,
-            ServiceType.OCR_SERVICE,
-            ServiceType.PROMPT_SERVICE,
-            ServiceType.RAG_SERVICE,
-            ServiceType.GENESIS_TRACING_SERVICE,
-        ):
+        if service_name == ServiceType.SETTINGS_SERVICE:
             return
         if service_name not in self.factories and default is None:
-            service_name_str = service_name.name if hasattr(service_name, "name") else str(service_name)
-            msg = f"No factory registered for the service class '{service_name_str}'"
+            msg = f"No factory registered for the service class '{service_name.name}'"
             raise NoFactoryRegisteredError(msg)
 
-    def update(self, service_name: ServiceType | str) -> None:
+    def update(self, service_name: ServiceType) -> None:
         """Update a service by its name."""
         if service_name in self.services:
             logger.debug(f"Update service {service_name}")

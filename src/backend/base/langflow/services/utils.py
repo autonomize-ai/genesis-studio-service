@@ -64,21 +64,12 @@ async def get_or_create_super_user(session: AsyncSession, username, password, is
         logger.debug("Creating default superuser.")
     else:
         logger.debug("Creating superuser.")
-    try:
-        return await create_super_user(username, password, db=session)
-    except Exception as exc:  # noqa: BLE001
-        if "UNIQUE constraint failed: user.username" in str(exc):
-            # This is to deal with workers running this
-            # at startup and trying to create the superuser
-            # at the same time.
-            logger.debug("Superuser already exists.", exc_info=True)
-            return None
-        logger.debug("Error creating superuser.", exc_info=True)
+    return await create_super_user(username, password, db=session)
 
 
 async def setup_superuser(settings_service: SettingsService, session: AsyncSession) -> None:
     if settings_service.auth_settings.AUTO_LOGIN:
-        logger.debug("AUTO_LOGIN is set to True. Creating default superuser.")
+        await logger.adebug("AUTO_LOGIN is set to True. Creating default superuser.")
         username = DEFAULT_SUPERUSER
         password = DEFAULT_SUPERUSER_PASSWORD.get_secret_value()
     else:
@@ -93,11 +84,7 @@ async def setup_superuser(settings_service: SettingsService, session: AsyncSessi
         msg = "Username and password must be set"
         raise ValueError(msg)
 
-    if not username or not password:
-        msg = "Username and password must be set"
-        raise ValueError(msg)
-
-    is_default = (username == DEFAULT_SUPERUSER) and (password == DEFAULT_SUPERUSER_PASSWORD)
+    is_default = (username == DEFAULT_SUPERUSER) and (password == DEFAULT_SUPERUSER_PASSWORD.get_secret_value())
 
     try:
         user = await get_or_create_super_user(
