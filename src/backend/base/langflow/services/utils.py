@@ -71,16 +71,16 @@ async def get_or_create_super_user(session: AsyncSession, username, password, is
             # This is to deal with workers running this
             # at startup and trying to create the superuser
             # at the same time.
-            logger.opt(exception=True).debug("Superuser already exists.")
+            logger.debug("Superuser already exists.", exc_info=True)
             return None
-        logger.opt(exception=True).debug("Error creating superuser.")
+        logger.debug("Error creating superuser.", exc_info=True)
 
 
 async def setup_superuser(settings_service: SettingsService, session: AsyncSession) -> None:
     if settings_service.auth_settings.AUTO_LOGIN:
         logger.debug("AUTO_LOGIN is set to True. Creating default superuser.")
         username = DEFAULT_SUPERUSER
-        password = DEFAULT_SUPERUSER_PASSWORD
+        password = DEFAULT_SUPERUSER_PASSWORD.get_secret_value()
     else:
         # Remove the default superuser if it exists
         await teardown_superuser(settings_service, session)
