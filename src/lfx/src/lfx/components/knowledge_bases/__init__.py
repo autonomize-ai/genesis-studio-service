@@ -7,15 +7,13 @@ from lfx.components._importing import import_mod
 if TYPE_CHECKING:
     from lfx.components.knowledge_bases.ingestion import KnowledgeIngestionComponent
     from lfx.components.knowledge_bases.retrieval import KnowledgeRetrievalComponent
-    from lfx.components.knowledge_bases.knowledge_hub import KnowledgeHubComponent
 
 _dynamic_imports = {
     "KnowledgeIngestionComponent": "ingestion",
     "KnowledgeRetrievalComponent": "retrieval",
-    "KnowledgeHubComponent": "knowledge_hub",
 }
 
-__all__ = ["KnowledgeIngestionComponent", "KnowledgeRetrievalComponent", "KnowledgeHubComponent"]
+__all__ = ["KnowledgeIngestionComponent", "KnowledgeRetrievalComponent"]
 
 
 def __getattr__(attr_name: str) -> Any:

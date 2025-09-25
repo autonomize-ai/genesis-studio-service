@@ -198,7 +198,7 @@ try:
         "prefix": "",
         "component_class": AzureChatOpenAIComponent(),
         "icon": AzureChatOpenAIComponent.icon,
-        "is_active": True,
+        "is_active": False,
     }
 except ImportError:
     pass

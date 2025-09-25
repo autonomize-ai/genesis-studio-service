@@ -265,9 +265,6 @@ def run(
         None, help="Defines the SSL certificate file path.", show_default=False
     ),
     ssl_key_file_path: str | None = typer.Option(None, help="Defines the SSL key file path.", show_default=False),
-    no_banner: bool | None = typer.Option(
-        None, help="Disable the startup banner.", show_default=False
-    ),
 ) -> None:
     """Run Langflow."""
     if env_file:
@@ -364,8 +361,7 @@ def run(
             # We _may_ be able to subprocess, but with window's spawn behavior, we'd have to move all
             # non-picklable code to the subprocess.
             progress.print_summary()
-            if not no_banner:
-                print_banner(host, port, protocol)
+            print_banner(host, port, protocol)
 
         # Blocking call, so must be outside of the progress step
         uvicorn.run(
@@ -400,8 +396,7 @@ def run(
 
         # Print summary and banner after server is ready
         progress.print_summary()
-        if not no_banner:
-            print_banner(host, port, protocol)
+        print_banner(host, port, protocol)
 
         # Handle browser opening
         if open_browser and not backend_only:
