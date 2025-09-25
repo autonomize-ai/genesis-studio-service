@@ -506,7 +506,7 @@
                 "show": true,
                 "title_case": false,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "code": {
                 "advanced": true,
@@ -589,7 +589,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "max_iterations": {
                 "_input_type": "IntInput",
@@ -644,7 +644,7 @@
                 "tool_mode": false,
                 "trace_as_metadata": true,
                 "type": "int",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "model_kwargs": {
                 "_input_type": "DictInput",
@@ -742,7 +742,7 @@
                 "tool_mode": false,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "output_schema": {
                 "_input_type": "TableInput",
@@ -912,7 +912,7 @@
                 "tool_mode": false,
                 "trace_as_metadata": true,
                 "type": "other",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "verbose": {
                 "_input_type": "BoolInput",
@@ -1072,7 +1072,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "default_service_code": {
                 "_input_type": "MessageTextInput",
@@ -1094,7 +1094,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               }
             },
             "tool_mode": false
@@ -1264,7 +1264,7 @@
                 "show": true,
                 "title_case": false,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "default_start_date": {
                 "advanced": false,
@@ -1420,7 +1420,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "default_service_codes": {
                 "_input_type": "MessageTextInput",
@@ -1442,7 +1442,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "default_state": {
                 "_input_type": "MessageTextInput",
@@ -1464,7 +1464,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               }
             },
             "tool_mode": false
@@ -1777,7 +1777,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               }
             },
             "tool_mode": false
@@ -2135,7 +2135,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "sender": {
                 "_input_type": "DropdownInput",
@@ -2200,7 +2200,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "should_store_message": {
                 "_input_type": "BoolInput",
@@ -2408,7 +2408,7 @@
                 "show": true,
                 "title_case": false,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "code": {
                 "advanced": true,
@@ -2491,7 +2491,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "max_iterations": {
                 "_input_type": "IntInput",
@@ -2546,7 +2546,7 @@
                 "tool_mode": false,
                 "trace_as_metadata": true,
                 "type": "int",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "model_kwargs": {
                 "_input_type": "DictInput",
@@ -2644,7 +2644,7 @@
                 "tool_mode": false,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "output_schema": {
                 "_input_type": "TableInput",
@@ -2814,7 +2814,7 @@
                 "tool_mode": false,
                 "trace_as_metadata": true,
                 "type": "other",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "tools_metadata": {
                 "_input_type": "ToolsInput",
@@ -3072,7 +3072,7 @@
                 "show": true,
                 "title_case": false,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "code": {
                 "advanced": true,
@@ -3155,7 +3155,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "max_iterations": {
                 "_input_type": "IntInput",
@@ -3210,7 +3210,7 @@
                 "tool_mode": false,
                 "trace_as_metadata": true,
                 "type": "int",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "model_kwargs": {
                 "_input_type": "DictInput",
@@ -3308,7 +3308,7 @@
                 "tool_mode": false,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "output_schema": {
                 "_input_type": "TableInput",
@@ -3478,7 +3478,7 @@
                 "tool_mode": false,
                 "trace_as_metadata": true,
                 "type": "other",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "tools_metadata": {
                 "_input_type": "ToolsInput",
@@ -3707,7 +3707,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               }
             },
             "tool_mode": false
@@ -3869,7 +3869,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               }
             },
             "tool_mode": false
@@ -4010,7 +4010,7 @@
                 "title_case": false,
                 "trace_as_metadata": true,
                 "type": "file",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "input_value": {
                 "_input_type": "MultilineInput",
@@ -4031,7 +4031,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "sender": {
                 "_input_type": "DropdownInput",
@@ -4096,7 +4096,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "OPENAI_API_KEY"
               },
               "should_store_message": {
                 "_input_type": "BoolInput",
