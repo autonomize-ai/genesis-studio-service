@@ -240,7 +240,7 @@
                 "show": true,
                 "title_case": false,
                 "type": "str",
-                "value": ""
+                "value": "AZURE_OPENAI_API_KEY"
               },
               "api_version": {
                 "_input_type": "DropdownInput",
@@ -355,7 +355,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "AZURE_OPENAI_API_KEY"
               },
               "max_tokens": {
                 "_input_type": "IntInput",
@@ -372,7 +372,7 @@
                 "tool_mode": false,
                 "trace_as_metadata": true,
                 "type": "int",
-                "value": ""
+                "value": "AZURE_OPENAI_API_KEY"
               },
               "stream": {
                 "_input_type": "BoolInput",
@@ -543,7 +543,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "AZURE_OPENAI_API_KEY"
               }
             },
             "tool_mode": false
@@ -734,7 +734,7 @@
                 "title_case": false,
                 "trace_as_metadata": true,
                 "type": "other",
-                "value": ""
+                "value": "AZURE_OPENAI_API_KEY"
               },
               "ignore_unspecified_files": {
                 "_input_type": "BoolInput",
@@ -854,7 +854,7 @@
                 "title_case": false,
                 "trace_as_metadata": true,
                 "type": "other",
-                "value": ""
+                "value": "AZURE_OPENAI_API_KEY"
               },
               "use_multithreading": {
                 "_input_type": "BoolInput",
@@ -1053,7 +1053,7 @@
                 "tool_mode": false,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "AZURE_OPENAI_API_KEY"
               }
             },
             "tool_mode": false
@@ -1184,7 +1184,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "other",
-                "value": ""
+                "value": "AZURE_OPENAI_API_KEY"
               },
               "sep": {
                 "_input_type": "StrInput",
@@ -1369,7 +1369,7 @@
                 "tool_mode": false,
                 "trace_as_input": true,
                 "type": "prompt",
-                "value": ""
+                "value": "AZURE_OPENAI_API_KEY"
               },
               "tool_placeholder": {
                 "_input_type": "MessageTextInput",
@@ -1392,7 +1392,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": ""
+                "value": "AZURE_OPENAI_API_KEY"
               }
             },
             "tool_mode": false

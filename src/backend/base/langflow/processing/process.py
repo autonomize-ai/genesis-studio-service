@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from typing import TYPE_CHECKING, Any, cast
 
 from lfx.graph.vertex.base import Vertex
@@ -137,6 +138,23 @@ def validate_input(
     return nodes
 
 
+def _resolve_env_var(value: Any) -> Any:
+    """Resolve environment variables for API key fields.
+
+    If the value is a string that looks like an environment variable name
+    (contains only uppercase letters, numbers, and underscores), attempt
+    to resolve it from environment variables.
+    """
+    if isinstance(value, str) and value:
+        # Check if it looks like an environment variable name
+        if value.replace('_', '').replace('-', '').isalnum() and any(c.isupper() for c in value):
+            env_value = os.getenv(value)
+            if env_value:
+                logger.debug(f"Resolved environment variable {value} for API key field")
+                return env_value
+    return value
+
+
 def apply_tweaks(node: dict[str, Any], node_tweaks: dict[str, Any]) -> None:
     template_data = node.get("data", {}).get("node", {}).get("template")
 
@@ -144,6 +162,15 @@ def apply_tweaks(node: dict[str, Any], node_tweaks: dict[str, Any]) -> None:
         logger.warning(f"Template data for node {node.get('id')} should be a dictionary")
         return
 
+    # First, resolve environment variables for existing API key fields in the template
+    for field_name, field_config in template_data.items():
+        if field_name == "api_key" and isinstance(field_config, dict) and "value" in field_config:
+            current_value = field_config["value"]
+            resolved_value = _resolve_env_var(current_value)
+            if resolved_value != current_value:
+                field_config["value"] = resolved_value
+
+    # Then apply any provided tweaks
     for tweak_name, tweak_value in node_tweaks.items():
         if tweak_name not in template_data:
             continue
@@ -151,16 +178,19 @@ def apply_tweaks(node: dict[str, Any], node_tweaks: dict[str, Any]) -> None:
             logger.warning("Security: Code field cannot be overridden via tweaks.")
             continue
         if tweak_name in template_data:
+            # Resolve environment variables for API key fields
+            resolved_value = _resolve_env_var(tweak_value) if tweak_name == "api_key" else tweak_value
+
             if template_data[tweak_name]["type"] == "NestedDict":
-                value = validate_and_repair_json(tweak_value)
+                value = validate_and_repair_json(resolved_value)
                 template_data[tweak_name]["value"] = value
-            elif isinstance(tweak_value, dict):
-                for k, v in tweak_value.items():
+            elif isinstance(resolved_value, dict):
+                for k, v in resolved_value.items():
                     k_ = "file_path" if template_data[tweak_name]["type"] == "file" else k
                     template_data[tweak_name][k_] = v
             else:
                 key = "file_path" if template_data[tweak_name]["type"] == "file" else "value"
-                template_data[tweak_name][key] = tweak_value
+                template_data[tweak_name][key] = resolved_value
 
 
 def apply_tweaks_on_vertex(vertex: Vertex, node_tweaks: dict[str, Any]) -> None:
