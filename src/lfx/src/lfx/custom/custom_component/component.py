@@ -1021,6 +1021,26 @@ class Component(CustomComponent):
             input_.value = value
             params[input_.name] = input_.value
 
+    def _resolve_env_var_for_component(self, value: str, field_name: str) -> str:
+        """Resolve environment variables for API key fields in components.
+
+        Args:
+            value: The current value of the field
+            field_name: The name of the field (should be 'api_key')
+
+        Returns:
+            The resolved value or original value if no resolution needed
+        """
+        if field_name == "api_key" and isinstance(value, str) and value:
+            # Check if it looks like an environment variable name
+            if value.replace('_', '').replace('-', '').isalnum() and any(c.isupper() for c in value):
+                import os
+                env_value = os.getenv(value)
+                if env_value:
+                    self.log(f"Resolved environment variable {value} for {self.display_name} API key", "INFO")
+                    return env_value
+        return value
+
     def set_attributes(self, params: dict) -> None:
         """Sets component attributes from the given parameters, preventing conflicts with reserved attribute names.
 
@@ -1029,8 +1049,17 @@ class Component(CustomComponent):
             value differs from the current attribute value.
         """
         self._validate_inputs(params)
-        attributes = {}
+
+        # Resolve environment variables for API key fields
+        resolved_params = {}
         for key, value in params.items():
+            if key == "api_key" and value:
+                resolved_params[key] = self._resolve_env_var_for_component(value, key)
+            else:
+                resolved_params[key] = value
+
+        attributes = {}
+        for key, value in resolved_params.items():
             if key in self.__dict__ and key not in self._attributes and value != getattr(self, key):
                 msg = (
                     f"{self.__class__.__name__} defines an input parameter named '{key}' "
@@ -1040,7 +1069,11 @@ class Component(CustomComponent):
             attributes[key] = value
         for key, input_obj in self._inputs.items():
             if key not in attributes and key not in self._attributes:
-                attributes[key] = input_obj.value or None
+                input_value = input_obj.value or None
+                # Also resolve environment variables for default input values
+                if key == "api_key" and input_value:
+                    input_value = self._resolve_env_var_for_component(input_value, key)
+                attributes[key] = input_value
 
         self._attributes.update(attributes)
 
