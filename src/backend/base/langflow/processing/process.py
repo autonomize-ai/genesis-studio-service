@@ -168,24 +168,49 @@ def apply_tweaks(node: dict[str, Any], node_tweaks: dict[str, Any]) -> None:
             current_value = field_config.get("value")
             # If api_key field has no value or empty value, try to infer the correct env var
             if not current_value:
-                # Try to infer the environment variable name based on context
-                # Check if this looks like a Google component
-                if any("google" in str(v).lower() for v in template_data.values() if isinstance(v, dict) and "display_name" in v):
-                    current_value = "GOOGLE_API_KEY"
-                    field_config["value"] = current_value
-                # Check if this looks like an OpenAI component
-                elif any("openai" in str(v).lower() for v in template_data.values() if isinstance(v, dict) and "display_name" in v):
-                    # Check if it's Azure OpenAI or regular OpenAI
-                    if any("azure" in str(v).lower() for v in template_data.values() if isinstance(v, dict) and "display_name" in v):
+                # Try to infer the environment variable name based on the selected model provider
+                # Check if there's an agent_llm field that indicates the selected provider
+                agent_llm_value = None
+                for field_name, field_config_inner in template_data.items():
+                    if field_name == "agent_llm" and isinstance(field_config_inner, dict) and "value" in field_config_inner:
+                        agent_llm_value = field_config_inner["value"]
+                        break
+
+                if agent_llm_value:
+                    # Use the selected model provider to determine the API key
+                    if agent_llm_value == "Google Generative AI":
+                        current_value = "GOOGLE_API_KEY"
+                        field_config["value"] = current_value
+                    elif agent_llm_value == "Azure OpenAI":
                         current_value = "AZURE_OPENAI_API_KEY"
                         field_config["value"] = current_value
-                    else:
+                    elif agent_llm_value == "OpenAI":
                         current_value = "OPENAI_API_KEY"
                         field_config["value"] = current_value
-                # Check if this looks like an Anthropic component
-                elif any("anthropic" in str(v).lower() for v in template_data.values() if isinstance(v, dict) and "display_name" in v):
-                    current_value = "ANTHROPIC_API_KEY"
-                    field_config["value"] = current_value
+                    elif agent_llm_value == "Anthropic":
+                        current_value = "ANTHROPIC_API_KEY"
+                        field_config["value"] = current_value
+                else:
+                    # Fallback: try to infer from component display name
+                    component_display_name = None
+                    for field_config_inner in template_data.values():
+                        if isinstance(field_config_inner, dict) and field_config_inner.get("name") == "display_name":
+                            component_display_name = field_config_inner.get("value")
+                            break
+
+                    if component_display_name:
+                        if "google" in component_display_name.lower():
+                            current_value = "GOOGLE_API_KEY"
+                            field_config["value"] = current_value
+                        elif "openai" in component_display_name.lower():
+                            if "azure" in component_display_name.lower():
+                                current_value = "AZURE_OPENAI_API_KEY"
+                            else:
+                                current_value = "OPENAI_API_KEY"
+                            field_config["value"] = current_value
+                        elif "anthropic" in component_display_name.lower():
+                            current_value = "ANTHROPIC_API_KEY"
+                            field_config["value"] = current_value
 
             if current_value:
                 resolved_value = _resolve_env_var(current_value)
