@@ -227,9 +227,15 @@ def process_tweaks(
                 apply_tweaks(node, value)
         else:
             all_nodes_tweaks[key] = value
+
+    # Always apply tweaks to all nodes (even with empty tweaks) to resolve environment variables
     if all_nodes_tweaks:
         for node in nodes:
             apply_tweaks(node, all_nodes_tweaks)
+    else:
+        # Apply empty tweaks to all nodes to ensure environment variables are resolved
+        for node in nodes:
+            apply_tweaks(node, {})
 
     return graph_data
 
