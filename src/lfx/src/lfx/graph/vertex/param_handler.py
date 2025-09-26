@@ -161,6 +161,7 @@ class ParameterHandler:
         elif field.get("required"):
             field_display_name = field.get("display_name")
             error_msg = f"File path not found for {field_display_name} in component {self.vertex.display_name}"
+            logger.error(f"DEBUG: process_file_field called for required file field. Component: {self.vertex.display_name}, Field: {field_name}")
             logger.error(error_msg)
             raise FileNotFoundError(error_msg)
         elif field["list"]:
