@@ -195,7 +195,7 @@ def apply_tweaks(node: dict[str, Any], node_tweaks: dict[str, Any]) -> None:
                     # Check for component display_name in various possible locations
                     component_display_name = None
 
-                    # Check if there's a _type field indicating the component class
+                    # Check for component information in template
                     component_type = None
                     for field_config_inner in template_data.values():
                         if isinstance(field_config_inner, dict):
@@ -204,20 +204,28 @@ def apply_tweaks(node: dict[str, Any], node_tweaks: dict[str, Any]) -> None:
                             elif field_config_inner.get("_type") and "Component" in field_config_inner.get("_type", ""):
                                 component_type = field_config_inner.get("_type")
 
+                    # Debug logging
+                    if component_type:
+                        logger.debug(f"Detected component type: {component_type} for api_key field")
+
                     # If we found component type, infer from that
                     if component_type:
                         if "GoogleGenerativeAI" in component_type or "Google" in component_type:
                             current_value = "GOOGLE_API_KEY"
                             field_config["value"] = current_value
-                        elif "OpenAI" in component_type and "Azure" in component_type:
+                            logger.debug(f"Set GOOGLE_API_KEY for component type: {component_type}")
+                        elif ("Azure" in component_type and "OpenAI" in component_type) or "AzureChatOpenAI" in component_type:
                             current_value = "AZURE_OPENAI_API_KEY"
                             field_config["value"] = current_value
+                            logger.debug(f"Set AZURE_OPENAI_API_KEY for component type: {component_type}")
                         elif "OpenAI" in component_type:
                             current_value = "OPENAI_API_KEY"
                             field_config["value"] = current_value
+                            logger.debug(f"Set OPENAI_API_KEY for component type: {component_type}")
                         elif "Anthropic" in component_type:
                             current_value = "ANTHROPIC_API_KEY"
                             field_config["value"] = current_value
+                            logger.debug(f"Set ANTHROPIC_API_KEY for component type: {component_type}")
                     # Otherwise try display name
                     elif component_display_name:
                         if "google" in component_display_name.lower():
