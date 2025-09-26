@@ -26,17 +26,23 @@ class LanguageModelComponent(LCModelComponent):
 
     def set_attributes(self, params: dict) -> None:
         """Set component attributes with provider-specific defaults for api_key."""
+        print(f"DEBUG LanguageModelComponent.set_attributes called with params: {params}")
+
         # Set default api_key value based on provider if not provided
         if "provider" in params and "api_key" not in params:
             provider = params["provider"]
+            print(f"DEBUG: Provider is {provider}, setting default api_key")
             if provider == "OpenAI":
                 params["api_key"] = "OPENAI_API_KEY"
             elif provider == "Azure OpenAI":
                 params["api_key"] = "AZURE_OPENAI_API_KEY"
+                print(f"DEBUG: Set api_key to AZURE_OPENAI_API_KEY")
             elif provider == "Anthropic":
                 params["api_key"] = "ANTHROPIC_API_KEY"
             elif provider == "Google":
                 params["api_key"] = "GOOGLE_API_KEY"
+
+        print(f"DEBUG: Final params after processing: {params}")
 
         # Call parent set_attributes
         super().set_attributes(params)
@@ -127,6 +133,25 @@ class LanguageModelComponent(LCModelComponent):
         model_name = self.model_name
         temperature = self.temperature
         stream = self.stream
+
+        # Auto-resolve api_key if missing and provider is set
+        if not self.api_key and provider:
+            if provider == "OpenAI":
+                self.api_key = "OPENAI_API_KEY"
+            elif provider == "Azure OpenAI":
+                self.api_key = "AZURE_OPENAI_API_KEY"
+            elif provider == "Anthropic":
+                self.api_key = "ANTHROPIC_API_KEY"
+            elif provider == "Google":
+                self.api_key = "GOOGLE_API_KEY"
+
+            # Resolve environment variable
+            if self.api_key and isinstance(self.api_key, str):
+                import os
+                env_value = os.getenv(self.api_key)
+                if env_value:
+                    self.api_key = env_value
+                    self.log(f"Resolved environment variable {self.api_key} for {self.display_name} API key", "INFO")
 
         if provider == "OpenAI":
             if not self.api_key:
