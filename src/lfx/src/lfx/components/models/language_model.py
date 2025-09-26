@@ -26,23 +26,17 @@ class LanguageModelComponent(LCModelComponent):
 
     def set_attributes(self, params: dict) -> None:
         """Set component attributes with provider-specific defaults for api_key."""
-        print(f"DEBUG LanguageModelComponent.set_attributes called with params: {params}")
-
         # Set default api_key value based on provider if not provided
         if "provider" in params and "api_key" not in params:
             provider = params["provider"]
-            print(f"DEBUG: Provider is {provider}, setting default api_key")
             if provider == "OpenAI":
                 params["api_key"] = "OPENAI_API_KEY"
             elif provider == "Azure OpenAI":
                 params["api_key"] = "AZURE_OPENAI_API_KEY"
-                print(f"DEBUG: Set api_key to AZURE_OPENAI_API_KEY")
             elif provider == "Anthropic":
                 params["api_key"] = "ANTHROPIC_API_KEY"
             elif provider == "Google":
                 params["api_key"] = "GOOGLE_API_KEY"
-
-        print(f"DEBUG: Final params after processing: {params}")
 
         # Call parent set_attributes
         super().set_attributes(params)
