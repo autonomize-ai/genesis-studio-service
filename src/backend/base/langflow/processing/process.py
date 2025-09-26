@@ -164,11 +164,33 @@ def apply_tweaks(node: dict[str, Any], node_tweaks: dict[str, Any]) -> None:
 
     # First, resolve environment variables for existing API key fields in the template
     for field_name, field_config in template_data.items():
-        if field_name == "api_key" and isinstance(field_config, dict) and "value" in field_config:
-            current_value = field_config["value"]
-            resolved_value = _resolve_env_var(current_value)
-            if resolved_value != current_value:
-                field_config["value"] = resolved_value
+        if field_name == "api_key" and isinstance(field_config, dict):
+            current_value = field_config.get("value")
+            # If api_key field has no value or empty value, try to infer the correct env var
+            if not current_value:
+                # Try to infer the environment variable name based on context
+                # Check if this looks like a Google component
+                if any("google" in str(v).lower() for v in template_data.values() if isinstance(v, dict) and "display_name" in v):
+                    current_value = "GOOGLE_API_KEY"
+                    field_config["value"] = current_value
+                # Check if this looks like an OpenAI component
+                elif any("openai" in str(v).lower() for v in template_data.values() if isinstance(v, dict) and "display_name" in v):
+                    # Check if it's Azure OpenAI or regular OpenAI
+                    if any("azure" in str(v).lower() for v in template_data.values() if isinstance(v, dict) and "display_name" in v):
+                        current_value = "AZURE_OPENAI_API_KEY"
+                        field_config["value"] = current_value
+                    else:
+                        current_value = "OPENAI_API_KEY"
+                        field_config["value"] = current_value
+                # Check if this looks like an Anthropic component
+                elif any("anthropic" in str(v).lower() for v in template_data.values() if isinstance(v, dict) and "display_name" in v):
+                    current_value = "ANTHROPIC_API_KEY"
+                    field_config["value"] = current_value
+
+            if current_value:
+                resolved_value = _resolve_env_var(current_value)
+                if resolved_value != current_value:
+                    field_config["value"] = resolved_value
 
     # Then apply any provided tweaks
     for tweak_name, tweak_value in node_tweaks.items():
