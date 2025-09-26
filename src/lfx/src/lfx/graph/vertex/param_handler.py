@@ -160,12 +160,9 @@ class ParameterHandler:
             params[field_name] = full_path
         elif field.get("required"):
             field_display_name = field.get("display_name")
-            logger.warning(
-                "File path not found for {} in component {}. Setting to None.",
-                field_display_name,
-                self.vertex.display_name,
-            )
-            params[field_name] = None
+            error_msg = f"File path not found for {field_display_name} in component {self.vertex.display_name}"
+            logger.error(error_msg)
+            raise FileNotFoundError(error_msg)
         elif field["list"]:
             params[field_name] = []
         else:
