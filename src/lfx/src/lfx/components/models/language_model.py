@@ -24,6 +24,23 @@ class LanguageModelComponent(LCModelComponent):
     category = "models"
     priority = 0  # Set priority to 0 to make it appear first
 
+    def set_attributes(self, params: dict) -> None:
+        """Set component attributes with provider-specific defaults for api_key."""
+        # Set default api_key value based on provider if not provided
+        if "provider" in params and "api_key" not in params:
+            provider = params["provider"]
+            if provider == "OpenAI":
+                params["api_key"] = "OPENAI_API_KEY"
+            elif provider == "Azure OpenAI":
+                params["api_key"] = "AZURE_OPENAI_API_KEY"
+            elif provider == "Anthropic":
+                params["api_key"] = "ANTHROPIC_API_KEY"
+            elif provider == "Google":
+                params["api_key"] = "GOOGLE_API_KEY"
+
+        # Call parent set_attributes
+        super().set_attributes(params)
+
     inputs = [
         DropdownInput(
             name="provider",
@@ -171,7 +188,6 @@ class LanguageModelComponent(LCModelComponent):
                 build_config["model_name"]["options"] = OPENAI_CHAT_MODEL_NAMES + OPENAI_REASONING_MODEL_NAMES
                 build_config["model_name"]["value"] = OPENAI_CHAT_MODEL_NAMES[0]
                 build_config["api_key"]["display_name"] = "OpenAI API Key"
-                build_config["api_key"]["value"] = "OPENAI_API_KEY"
                 build_config["azure_endpoint"]["show"] = False
                 build_config["api_version"]["show"] = False
             elif field_value == "Azure OpenAI":
@@ -179,21 +195,18 @@ class LanguageModelComponent(LCModelComponent):
                 build_config["model_name"]["options"] = OPENAI_CHAT_MODEL_NAMES + OPENAI_REASONING_MODEL_NAMES
                 build_config["model_name"]["value"] = OPENAI_CHAT_MODEL_NAMES[0]
                 build_config["api_key"]["display_name"] = "Azure OpenAI API Key"
-                build_config["api_key"]["value"] = "AZURE_OPENAI_API_KEY"
                 build_config["azure_endpoint"]["show"] = True
                 build_config["api_version"]["show"] = True
             elif field_value == "Anthropic":
                 build_config["model_name"]["options"] = ANTHROPIC_MODELS
                 build_config["model_name"]["value"] = ANTHROPIC_MODELS[0]
                 build_config["api_key"]["display_name"] = "Anthropic API Key"
-                build_config["api_key"]["value"] = "ANTHROPIC_API_KEY"
                 build_config["azure_endpoint"]["show"] = False
                 build_config["api_version"]["show"] = False
             elif field_value == "Google":
                 build_config["model_name"]["options"] = GOOGLE_GENERATIVE_AI_MODELS
                 build_config["model_name"]["value"] = GOOGLE_GENERATIVE_AI_MODELS[0]
                 build_config["api_key"]["display_name"] = "Google API Key"
-                build_config["api_key"]["value"] = "GOOGLE_API_KEY"
                 build_config["azure_endpoint"]["show"] = False
                 build_config["api_version"]["show"] = False
         elif field_name == "model_name" and field_value.startswith("o1") and self.provider == "OpenAI":
