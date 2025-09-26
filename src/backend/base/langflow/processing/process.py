@@ -191,14 +191,35 @@ def apply_tweaks(node: dict[str, Any], node_tweaks: dict[str, Any]) -> None:
                         current_value = "ANTHROPIC_API_KEY"
                         field_config["value"] = current_value
                 else:
-                    # Fallback: try to infer from component display name
+                    # Fallback: try to infer from component information in template
+                    # Check for component display_name in various possible locations
                     component_display_name = None
-                    for field_config_inner in template_data.values():
-                        if isinstance(field_config_inner, dict) and field_config_inner.get("name") == "display_name":
-                            component_display_name = field_config_inner.get("value")
-                            break
 
-                    if component_display_name:
+                    # Check if there's a _type field indicating the component class
+                    component_type = None
+                    for field_config_inner in template_data.values():
+                        if isinstance(field_config_inner, dict):
+                            if field_config_inner.get("name") == "display_name":
+                                component_display_name = field_config_inner.get("value")
+                            elif field_config_inner.get("_type") and "Component" in field_config_inner.get("_type", ""):
+                                component_type = field_config_inner.get("_type")
+
+                    # If we found component type, infer from that
+                    if component_type:
+                        if "GoogleGenerativeAI" in component_type or "Google" in component_type:
+                            current_value = "GOOGLE_API_KEY"
+                            field_config["value"] = current_value
+                        elif "OpenAI" in component_type and "Azure" in component_type:
+                            current_value = "AZURE_OPENAI_API_KEY"
+                            field_config["value"] = current_value
+                        elif "OpenAI" in component_type:
+                            current_value = "OPENAI_API_KEY"
+                            field_config["value"] = current_value
+                        elif "Anthropic" in component_type:
+                            current_value = "ANTHROPIC_API_KEY"
+                            field_config["value"] = current_value
+                    # Otherwise try display name
+                    elif component_display_name:
                         if "google" in component_display_name.lower():
                             current_value = "GOOGLE_API_KEY"
                             field_config["value"] = current_value
