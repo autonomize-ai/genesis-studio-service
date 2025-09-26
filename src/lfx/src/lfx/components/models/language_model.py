@@ -171,6 +171,7 @@ class LanguageModelComponent(LCModelComponent):
                 build_config["model_name"]["options"] = OPENAI_CHAT_MODEL_NAMES + OPENAI_REASONING_MODEL_NAMES
                 build_config["model_name"]["value"] = OPENAI_CHAT_MODEL_NAMES[0]
                 build_config["api_key"]["display_name"] = "OpenAI API Key"
+                build_config["api_key"]["value"] = "OPENAI_API_KEY"
                 build_config["azure_endpoint"]["show"] = False
                 build_config["api_version"]["show"] = False
             elif field_value == "Azure OpenAI":
@@ -178,18 +179,21 @@ class LanguageModelComponent(LCModelComponent):
                 build_config["model_name"]["options"] = OPENAI_CHAT_MODEL_NAMES + OPENAI_REASONING_MODEL_NAMES
                 build_config["model_name"]["value"] = OPENAI_CHAT_MODEL_NAMES[0]
                 build_config["api_key"]["display_name"] = "Azure OpenAI API Key"
+                build_config["api_key"]["value"] = "AZURE_OPENAI_API_KEY"
                 build_config["azure_endpoint"]["show"] = True
                 build_config["api_version"]["show"] = True
             elif field_value == "Anthropic":
                 build_config["model_name"]["options"] = ANTHROPIC_MODELS
                 build_config["model_name"]["value"] = ANTHROPIC_MODELS[0]
                 build_config["api_key"]["display_name"] = "Anthropic API Key"
+                build_config["api_key"]["value"] = "ANTHROPIC_API_KEY"
                 build_config["azure_endpoint"]["show"] = False
                 build_config["api_version"]["show"] = False
             elif field_value == "Google":
                 build_config["model_name"]["options"] = GOOGLE_GENERATIVE_AI_MODELS
                 build_config["model_name"]["value"] = GOOGLE_GENERATIVE_AI_MODELS[0]
                 build_config["api_key"]["display_name"] = "Google API Key"
+                build_config["api_key"]["value"] = "GOOGLE_API_KEY"
                 build_config["azure_endpoint"]["show"] = False
                 build_config["api_version"]["show"] = False
         elif field_name == "model_name" and field_value.startswith("o1") and self.provider == "OpenAI":
